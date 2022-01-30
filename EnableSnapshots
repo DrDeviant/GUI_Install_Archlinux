@@ -1,0 +1,21 @@
+#!/bin/bash
+## Maintainer Alexander Mcmillan <linuxguy93@gmail.com>
+## Post Install Script
+## Fully enable btrfs snapshots with this post install script
+
+if [[ "$USER" == "root" ]]; then
+    ## Install snapper snapshoting tool
+    pacman -Syy --noconfirm snapper rsync
+    ## Unmount @snapshots subvolume
+    umount /.snapshots
+    ## Remove .snapshots directory
+    rmdir /.snapshots
+    ## Create root snapper BTRFS config
+    snapper -c root create-config /
+    ## Add pacman hook for snap-pac to pickup kernel images
+    install -Dm644 50-bootbackup.hook /etc/pacman.d/hooks/50-bootbackup.hook
+    ## Completetion Message
+    echo "Congraulations, you now have fully enabled btrfs snapshots. Your system will now restart..." && sleep 5
+    ## Restart computer
+    systemctl reboot
+fi

@@ -1,0 +1,287 @@
+#!/bin/sh
+
+## Distribution Name
+DISTRO_NAME="Archlinux"
+
+## Yad Variables
+SEPARATOR="|"
+ITEMSPLIT=","
+
+DRIVES=`blkid | cut -d ":" -f 1 | sort | tr "\n" "$ITEMSPLIT" | sed 's/.$//'`
+KEYMAPS=`localectl list-x11-keymap-layouts | tr "\n" "$ITEMSPLIT" | sed 's/.$//'`
+LOCALES=`cat /etc/locale.gen | grep "UTF-8" | cut -d " " -f 1 | sed "s/^#//" | tr "\n" "$ITEMSPLIT" | sed 's/.$//'`
+TZONES=`timedatectl list-timezones | tr "\n" "$ITEMSPLIT"`
+
+## Desktop Editions
+EDITIONS=`echo "Base,Plasma"`
+
+## MISC SETUP VARIABLES
+# Configure the number of zram devices to use, 2 is the default
+ZRAMDEVICES="2"
+# The total amount of memory io use (in MiB), This is the amount of zram swap used. DO NOT CHANGE ANYTHING HERE!
+ZRAMTOTAL=`cat /proc/meminfo | grep "MemTotal" | cut -d " " -f 8`
+ZRAMTOTAL="$(($ZRAMTOTAL/1024))"
+
+## Graphics Card Detection, DONT'T TOUCH!
+DETECT_GPU=`lspci | grep VGA | cut -d ":" -f 3 | cut -d " " -f 2`
+
+#<-- OS Install List -->
+
+## Install base system
+INSTALL_BASE="alsa-card-profiles alsa-lib alsa-plugins alsa-topology-conf alsa-ucm-conf bash-completion bc btrfs-progs crda dbus-broker dosfstools e2fsprogs exfatprogs f2fs-tools git gptfdisk htop iwd man-db man-pages mtools net-tools networkmanager networkmanager-openvpn openssh os-prober p7zip realtime-privileges rtirq subversion sudo traceroute unrar unzip wget wpa_supplicant xdg-user-dirs xfsprogs"
+
+## Install KDE Plasma desktop
+INSTALL_PLASMA="appmenu-gtk-module argyllcms ark audiocd-kio avahi baka-mplayer bluedevil bluez bluez-cups bluez-hid2hci bluez-libs bluez-plugins bluez-qt bluez-utils breeze breeze-gtk calf carla cdparanoia cdrdao cdrtools chmlib cups cups-filters cups-pdf darktable dcraw distrho-ports dolphin dolphin-plugins dosbox dragonfly-reverb dvd+rw-tools easy-rsa ebook-tools efibootmgr elisa espeak-ng espeak-ng-espeak extra-cmake-modules fatresize faudio ffmpeg ffmpegthumbs firefox fluidsynth freerdp frei0r-plugins gamemode geoip-database geoip-database-extra gimp gimp-nufraw gimp-plugin-gmic gmic gnu-free-fonts gst-libav gst-plugin-opencv gst-plugin-pipewire gst-plugins-bad gst-plugins-bad-libs gst-plugins-base gst-plugins-base-libs gst-plugins-espeak gst-plugins-good gst-plugins-ugly gstreamer gstreamer-vaapi gtk2 gtk3 guitarix gxplugins.lv2 gwenview gxplugins.lv2 handbrake hunspell hunspell-en_au hunspell-en_ca hunspell-en_gb hunspell-en_us hyphen hyphen-en k3b kaccounts-providers kamera kate kcalc kcm-wacomtablet kde-cli-tools kdeconnect kdegraphics-mobipocket kdegraphics-thumbnailers kde-gtk-config kdenlive kdialog keepassxc kf5 kf5-aids kgamma5 kid3 kimageformats kinfocenter kio-extras kio-gdrive kipi-plugins konsole konversation kopete kphotoalbum krdc krfb krita krita-plugin-gmic ksshaskpass ktorrent kwallet-pam lensfun lib32-faudio lib32-fluidsynth lib32-gamemode lib32-gst-plugins-base lib32-gst-plugins-base-libs lib32-gst-plugins-good lib32-gstreamer lib32-gtk2 lib32-gtk3 lib32-libappindicator-gtk2 lib32-libappindicator-gtk3 lib32-libcups lib32-libdbusmenu-glib lib32-libdbusmenu-gtk2 lib32-libdbusmenu-gtk3 lib32-libindicator-gtk2 lib32-libindicator-gtk3 lib32-libva lib32-libva-mesa-driver lib32-libva-vdpau-driver lib32-libvdpau lib32-mesa lib32-mesa-vdpau lib32-openal lib32-pipewire lib32-pipewire-jack lib32-pipewire-v4l2 libappimage libappindicator-gtk2 libappindicator-gtk3 libbluray libdbusmenu-glib libdbusmenu-gtk2 libdbusmenu-gtk3 libdbusmenu-qt5 libdbusmenu-qt6 libdvdcss libdvdnav libdvdread libindicator-gtk2 libindicator-gtk3 libmythes libpipewire02 libreoffice-fresh libva libva-mesa-driver libva-utils libva-vdpau-driver libvdpau libvdpau-va-gl lrzip lsb-release lutris mesa mesa-demos mesa-utils mesa-vdpau mlt movit mpv mythes-en networkmanager-qt noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra okteta okular opencolorio opencv opentimelineio orca partitionmanager perl-image-exiftool phonon-qt5-gstreamer phonon-qt5-vlc pipewire pipewire-alsa pipewire-jack pipewire-pulse pipewire-v4l2 pipewire-x11-bell pipewire-zeroconf plasma5-applets-window-buttons plasma-browser-integration plasma-desktop plasma-disks plasma-integration plasma-nm plasma-pa plasma-pass plasma-sdk plasma-systemmonitor plasma-thunderbolt plasma-vault plasma-wayland-protocols plasma-workspace plasma-workspace-wallpapers polkit-kde-agent poppler-data poppler-qt5 powerdevil print-manager pulseaudio-qt pulsemixer python-lsp-jsonrpc python-lsp-server qt5-base qt5-imageformats qt5-multimedia qt5-wayland qt6-base qt6-wayland quota-tools rust sddm sddm-kcm skanlite soundfont-fluid soundkonverter source-highlight spectacle speech-dispatcher sshfs steam steam-native-runtime swh-plugins systemsettings telepathy-accounts-signon telepathy-farstream telepathy-glib telepathy-kde-accounts-kcm telepathy-kde-approver telepathy-kde-auth-handler telepathy-kde-call-ui telepathy-kde-common-internals telepathy-kde-contact-list telepathy-kde-contact-runner telepathy-kde-desktop-applets telepathy-kde-filetransfer-handler telepathy-kde-integration-module telepathy-kde-send-file telepathy-kde-text-ui telepathy-logger telepathy-logger-qt telepathy-mission-control telepathy-qt thunderbird ttf-liberation unace unarchiver unoconv usbguard vcdimager vdpauinfo vi vid.stab vim vim-runtime vlc wine winetricks wireplumber x42-plugins xdg-user-dirs-gtk xf86-input-libinput xsettingsd youtube-dl yt-dlp zip zita-ajbridge"
+
+#<-- GPU Driver Install List -->
+
+## AMD GPU DRIVERS
+AMD_DRV="amf-headers base base-devel lib32-vulkan-mesa-layers lib32-ocl-icd lib32-opencl-mesa lib32-vulkan-radeon linux linux-firmware linux-headers multilib-devel ocl-icd opencl-headers opencl-mesa vulkan-radeon vulkan-mesa-layers"
+
+## INTEL GPU DRIVERS
+INTEL_DRV="base base-devel intel-compute-runtime intel-media-driver intel-media-sdk lib32-libva-intel-driver lib32-ocl-icd lib32-vulkan-intel lib32-vulkan-mesa-layers libva-intel-driver linux linux-firmware linux-headers multilib-devel ocl-icd opencl-headers vulkan-intel vulkan-mesa-layers"
+
+## NVIDIA GPU DRIVERS
+NVIDIA_DRV="base base-devel lib32-nvidia-cg-toolkit lib32-nvidia-utils lib32-ocl-icd lib32-opencl-nvidia lib32-vulkan-mesa-layers linux linux-firmware linux-headers multilib-devel nvidia-cg-toolkit nvidia-dkms nvidia-utils ocl-icd opencl-headers opencl-nvidia vulkan-mesa-layers"
+
+##<-- Install System, DO NOT EDIT BELOW THIS POINT IF YOU DON'T KNOW WHAT YOU'RE DOING! -->
+gui_installer() {
+    ## Yad GUI Archlinux Installer
+    GUI_INSTALLER=`yad --title "$DISTRO_NAME Installer" --form --height=200 --width=350 --item-separator="$ITEMSPLIT" \
+    --field="Boot Partition":CB $DRIVES \
+    --field="Root Partition":CB $DRIVES \
+    --field="Home Partition":CB $DRIVES \
+    --field="Keyboard Mapping":CB $KEYMAPS \
+    --field="System Locale":CB $LOCALES \
+    --field="Select Timezone":CB $TZONES \
+    --field="Desktop Edition":CB $EDITIONS \
+    --field="Computer Name":TXT "Computer Name" \
+    --field="Account Name":TXT "Username" \
+    --field="Password":TXT "Password" \
+    --field="Format Partitions":CHK \
+    --field="Mount Directory":DIR`
+
+    ## Create Variable Array
+    GUI_INSTALLER=(`echo $GUI_INSTALLER | tr "$SEPARATOR" "\n"`)
+
+    ## Installer Parsed Variables
+    BOOT_DEVICE="${GUI_INSTALLER[0]}"
+    ROOT_DEVICE="${GUI_INSTALLER[1]}"
+    HOME_DEVICE="${GUI_INSTALLER[2]}"
+    KEYMAP="${GUI_INSTALLER[3]}"
+    LOCALE="${GUI_INSTALLER[4]}"
+    TIMEZONE="${GUI_INSTALLER[5]}"
+    DE_BUNDLE="${GUI_INSTALLER[6]}"
+    HOSTNAME="${GUI_INSTALLER[7]}"
+    USERNAME="${GUI_INSTALLER[8]}"
+    PASSWORD="${GUI_INSTALLER[9]}"
+    FORMAT_DEVICE="${GUI_INSTALLER[10]}"
+    MOUNT_DIR="${GUI_INSTALLER[11]}"
+}
+
+partition_system() {
+    ## Create A BTRFS root partition
+    mkfs.btrfs -f $ROOT_DEVICE
+    ## Label BTRFS root partition
+    btrfs filesystem label $ROOT_DEVICE "${DISTRO_NAME}"
+    if [[ "${HOME_DEVICE}" == "${ROOT_DEVICE}" ]]; then
+        echo "Initializing Home Directory On Root Partition..."
+        echo "You May Desire A Separate Home Partition"
+    else
+        ## Create A BTRFS home partition
+        mkfs.btrfs -f $HOME_DEVICE
+        ## Label BTRFS home partition
+        btrfs filesystem label $HOME_DEVICE "Home"
+    fi
+    ## Create A UEFI Boot Partition
+    mkfs.vfat -F32 $BOOT_DEVICE
+    ## Label UEFI Boot Partition
+    fatlabel $BOOT_DEVICE "Boot"
+    echo "Formatted Partitions..." && sleep 5
+}
+
+install_base() {
+    ## Mount root filesystem
+    mount -t btrfs $ROOT_DEVICE $MOUNT_DIR
+    ## Remove BTRFS subvolumes if they exist
+    if [[ -d "$MOUNT_DIR/@" ]]; then
+        rm -rf $MOUNT_DIR/@
+    fi
+    if [[ -d "$MOUNT_DIR/@flatpak" ]]; then
+        rm -rf $MOUNT_DIR/@flatpak
+    fi
+    if [[ -d "$MOUNT_DIR/@snapshots" ]]; then
+        rm -rf $MOUNT_DIR/@snapshots
+    fi
+    if [[ -d "$MOUNT_DIR/@var_cache" ]]; then
+        rm -rf $MOUNT_DIR/@var_cache
+    fi
+    if [[ -d "$MOUNT_DIR/@var_log" ]]; then
+        rm -rf $MOUNT_DIR/@var_log
+    fi
+    ## Create BTRFS subvolumes
+    btrfs subvolume create $MOUNT_DIR/@
+    btrfs subvolume create $MOUNT_DIR/@flatpak
+    if [[ "${HOME_DEVICE}" == "${ROOT_DEVICE}" ]]; then
+        btrfs subvolume create $MOUNT_DIR/@home
+    fi
+    btrfs subvolume create $MOUNT_DIR/@snapshots
+    btrfs subvolume create $MOUNT_DIR/@var_cache
+    btrfs subvolume create $MOUNT_DIR/@var_log
+    ## Unmount root filesystem
+    umount $MOUNT_DIR
+    echo "Created Subvolumes..." && sleep 5
+
+    ## Mount root subvolume (Please use an SSD as this works best for BTRFS)
+    mount -t btrfs -o noatime,compress=zstd:3,discard=async,space_cache=v2,autodefrag,subvol=@ $ROOT_DEVICE $MOUNT_DIR
+    ## Make directories for other subvolumes
+    mkdir -p $MOUNT_DIR/.snapshots
+    mkdir -p $MOUNT_DIR/home
+    mkdir -p $MOUNT_DIR/var/cache
+    mkdir -p $MOUNT_DIR/var/lib/flatpak
+    mkdir -p $MOUNT_DIR/var/log
+    ## Mount other subvolumes (Please use an SSD as this works best for BTRFS)
+    mount -t btrfs -o noatime,compress=zstd:3,discard=async,space_cache=v2,autodefrag,subvol=@flatpak $ROOT_DEVICE $MOUNT_DIR/var/lib/flatpak
+    if [[ "${HOME_DEVICE}" == "${ROOT_DEVICE}" ]]; then
+        mount -t btrfs -o noatime,compress=zstd:3,discard=async,space_cache=v2,autodefrag,subvol=@home $ROOT_DEVICE $MOUNT_DIR/home
+    else
+        mount -t btrfs -o noatime,compress=zstd:3,discard=async,space_cache=v2,autodefrag,subvolid=5,subvol=/ $HOME_DEVICE $MOUNT_DIR/home
+    fi
+    mount -t btrfs -o noatime,compress=zstd:3,discard=async,space_cache=v2,autodefrag,subvol=@snapshots $ROOT_DEVICE $MOUNT_DIR/.snapshots
+    mount -t btrfs -o noatime,compress=zstd:3,discard=async,space_cache=v2,autodefrag,subvol=@var_cache $ROOT_DEVICE $MOUNT_DIR/var/cache
+    mount -t btrfs -o noatime,compress=zstd:3,discard=async,space_cache=v2,autodefrag,subvol=@var_log $ROOT_DEVICE $MOUNT_DIR/var/log
+    ## Make efi directory
+    mkdir -p $MOUNT_DIR/boot
+    ## Mount the efi partition
+    mount $BOOT_DEVICE $MOUNT_DIR/boot
+    echo "Mounted Partitions and Subvolumes..." && sleep 5
+
+    ## Initialize pacman-keyring (host)
+    pacman -Syy --noconfirm archlinux-keyring
+    rm -rf /etc/pacman.d/gnupg
+    pacman-key --init
+    pacman-key --populate
+
+    ## Install the display drivers
+    if [[ "$DETECT_GPU" == "Advanced" ]]; then
+        ## Install AMD GPU drivers
+        pacstrap $MOUNT_DIR $AMD_DRV
+        echo "Installed AMD Drivers..." && sleep 5
+    elif [[ "$DETECT_GPU" == "Intel" ]]; then
+        ## Install Intel GPU drivers
+        pacstrap $MOUNT_DIR $INTEL_DRV
+        echo "Installed Intel Drivers..." && sleep 5
+    elif [[ "$DETECT_GPU" == "NVIDIA" ]]; then
+        ## Install Nvidia GPU drivers
+        pacstrap $MOUNT_DIR $NVIDIA_DRV
+        ## Enable Nvidia related services
+        arch-chroot $MOUNT_DIR systemctl enable nvidia-hibernate
+        arch-chroot $MOUNT_DIR systemctl enable nvidia-persistenced
+        arch-chroot $MOUNT_DIR systemctl enable nvidia-resume
+        arch-chroot $MOUNT_DIR systemctl enable nvidia-suspend
+        echo "Installed Nvidia Drivers..." && sleep 5
+    fi
+
+    ## Install pacman.conf
+    install -Dm644 /etc/pacman.conf $MOUNT_DIR/etc/pacman.conf
+    ## Install sysctl config
+    install -Dm644 90-sysctl.conf $MOUNT_DIR/etc/sysctl.d/90-sysctl.conf
+    ## Install base packages
+    arch-chroot $MOUNT_DIR pacman -S --noconfirm $INSTALL_BASE
+    ## Generate filesystem mounts
+    genfstab -U $MOUNT_DIR > $MOUNT_DIR/etc/fstab
+
+    ## Create Linux boot entry
+    arch-chroot $MOUNT_DIR efibootmgr --disk ${BOOT_DEVICE%??} --part 1 --create --label "${DISTRO_NAME}" --loader /vmlinuz-linux --unicode "root=LABEL=${DISTRO_NAME} rootflags=subvol=@ resume=/dev/zram0 loglevel=3 mitigations=off nvidia-drm.modeset=1 threadirqs usbcore.autosuspend=-1 rw initrd=\initramfs-linux.img"
+
+    ## Configure Zram Installation
+    echo "zram" > $MOUNT_DIR/etc/modules-load.d/zram.conf
+    echo "options zram num_devices=$ZRAMDEVICES" > $MOUNT_DIR/etc/modprobe.d/zram.conf
+    echo "# ZRam Devices" >> $MOUNT_DIR/etc/fstab
+    for ((device=0;device<ZRAMDEVICES;device++)) do
+        echo "KERNEL==\"zram${device}\", ATTR{disksize}=\"$(($ZRAMTOTAL / $ZRAMDEVICES ))M\" RUN=\"/usr/bin/mkswap /dev/zram${device}\", TAG+=\"systemd\"" >> $MOUNT_DIR/etc/udev/rules.d/99-zram.rules
+        echo "/dev/zram${device} none swap defaults 0 0" >> $MOUNT_DIR/etc/fstab
+    done
+    ## Set hostname
+    echo "$HOSTNAME" > $MOUNT_DIR/etc/hostname
+    ## Configure global environment for use with TTY CLI
+    echo "EDITOR=/usr/bin/vim" >> $MOUNT_DIR/etc/environment
+    ## Set system language
+    echo "LANG=$LOCALE" > $MOUNT_DIR/etc/locale.conf
+    sed -i -e "s/#$LOCALE/$LOCALE/" $MOUNT_DIR/etc/locale.gen
+    arch-chroot $MOUNT_DIR locale-gen
+    arch-chroot $MOUNT_DIR localectl set-locale LANG=$LOCALE LANGUAGE=$LOCALE
+    ## Set keyboard layout
+    arch-chroot $MOUNT_DIR localectl set-keymap $KEYMAP
+    arch-chroot $MOUNT_DIR localectl set-x11-keymap $KEYMAP
+    ## Set timezone and correct time  
+    arch-chroot $MOUNT_DIR ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
+    ## Create the new non-root user
+    arch-chroot $MOUNT_DIR useradd -m $USERNAME
+    ## Set password for non-root and root user
+    echo "$USERNAME:$PASSWORD" | arch-chroot $MOUNT_DIR chpasswd
+    echo "root:$PASSWORD" | arch-chroot $MOUNT_DIR chpasswd
+
+    ## Enable the wheel group root privileges
+    sed -i -e 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' $MOUNT_DIR/etc/sudoers
+
+    ## Enable Plasma desktop services
+    arch-chroot $MOUNT_DIR systemctl disable dbus.service
+    arch-chroot $MOUNT_DIR systemctl enable dbus-broker.service
+    arch-chroot $MOUNT_DIR systemctl enable fstrim.timer
+    arch-chroot $MOUNT_DIR systemctl enable NetworkManager.service
+    arch-chroot $MOUNT_DIR systemctl enable ntpd.service
+    arch-chroot $MOUNT_DIR systemctl enable rtirq.service
+    arch-chroot $MOUNT_DIR systemctl enable rtirq-resume.service
+    arch-chroot $MOUNT_DIR systemctl enable sshd.service
+
+    ## Add user to groups
+    arch-chroot $MOUNT_DIR usermod -a -G audio $USERNAME
+    arch-chroot $MOUNT_DIR usermod -a -G realtime $USERNAME 
+    arch-chroot $MOUNT_DIR usermod -a -G video $USERNAME
+    arch-chroot $MOUNT_DIR usermod -a -G wheel $USERNAME
+    echo "Installed ReadyArch..." && sleep 5
+}
+
+install_plasma() {
+    ## Install Plasma desktop packages
+    arch-chroot $MOUNT_DIR pacman -S --noconfirm $INSTALL_PLASMA
+
+    ## Enable Plasma services
+    arch-chroot $MOUNT_DIR systemctl enable avahi-daemon.service
+    arch-chroot $MOUNT_DIR systemctl enable bluetooth.service
+    arch-chroot $MOUNT_DIR systemctl enable cups.service
+    arch-chroot $MOUNT_DIR systemctl enable sddm.service
+
+    ## Add user to groups
+    arch-chroot $MOUNT_DIR usermod -a -G games $USERNAME
+    arch-chroot $MOUNT_DIR usermod -a -G rtkit $USERNAME
+}
+
+##<-- Unmount OS -->
+unmount_os() {
+    ## Unmount Filesystems
+    umount -lf $MOUNT_DIR
+}
+
+##<-- Finished Dialog -->
+complete_dialog() {
+    yad --title "Archlinux Installer" --text "Finished Installing $DISTRO_NAME" --justify=center --height 50 --width 350
+}
+
+#<-- Main Program UNCOMMENT TO ACTIVATE --> ############
+if [[ $USER == "root" ]]; then
+    gui_installer
+    if [[ $FORMAT_DEVICE == "TRUE" ]]; then
+        partition_system
+    fi
+    if [[ $DE_BUNDLE == "Base" ]]; then
+        install_base
+    fi
+    if [[ $DE_BUNDLE == "Plasma" ]]; then
+        install_base
+        install_plasma
+    fi
+    unmount_os
+    complete_dialog
+fi
